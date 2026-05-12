@@ -7,7 +7,7 @@ license: MIT
 
 # vaults.fyi Strategist
 
-**Purpose:** Run deep strategy analysis using vaults.fyi's historical data, allocation intelligence, and benchmark infrastructure alongside Zerion wallet context to answer questions no other DeFi data source can.
+**Purpose:** Run deep strategy analysis using vaults.fyi's historical data and benchmark infrastructure alongside Zerion wallet context to answer questions no other DeFi data source can.
 
 ## When to use
 - "If I'd been in vault A instead of vault B, how much more would I have earned?"
@@ -35,7 +35,7 @@ license: MIT
 ## Requirements
 - Zerion CLI: `npm install -g zerion-cli`
 - Zerion API key: `export ZERION_API_KEY="zk_..."`
-- vaults.fyi MCP server connected
+- [vaults.fyi hosted MCP v2](https://mcp.vaults.fyi/mcp) connected
 
 ## Workflow
 

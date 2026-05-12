@@ -33,7 +33,7 @@ license: MIT
 ## Requirements
 - Zerion CLI: `npm install -g zerion-cli`
 - Zerion API key: `export ZERION_API_KEY="zk_..."`
-- vaults.fyi MCP server connected (provides yield data, vault search, benchmark rates)
+- [vaults.fyi hosted MCP v2](https://mcp.vaults.fyi/mcp) connected (provides yield data, vault search, benchmark rates)
 
 ## Workflow
 

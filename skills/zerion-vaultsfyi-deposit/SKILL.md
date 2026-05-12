@@ -33,7 +33,7 @@ license: MIT
 ## Requirements
 - Zerion CLI: `npm install -g zerion-cli`
 - Zerion API key: `export ZERION_API_KEY="zk_..."`
-- vaults.fyi MCP server connected
+- [vaults.fyi hosted MCP v2](https://mcp.vaults.fyi/mcp) connected
 - A funded wallet with sufficient balance of the deposit asset
 
 ## Workflow
@@ -119,7 +119,7 @@ Inspect `transactionalProperties.depositStepsType` from `vault_details` or `tran
 
 After safety and balance checks pass:
 
-- Call `build_vault_tx` with the wallet address, vault ID, network, `humanAmount` (e.g. "10"), and `decimals` from `transaction_context` (e.g. 6 for USDC, 18 for WETH). The tool converts to base units automatically.
+- Call `build_vault_tx` with `action: "deposit"`, `userAddress`, `network`, `vaultId`, and preferably `humanAmount` (e.g. "10") + `decimals` from `transaction_context` (e.g. 6 for USDC, 18 for WETH). The tool converts to base units automatically.
 - For complex deposit flows, `build_vault_tx` returns multiple ordered steps. Present all steps with their sequence and any required delays.
 - Present the unsigned transaction steps and decoded calls to the user.
 - Do not sign or broadcast. The user must explicitly approve.
@@ -128,7 +128,7 @@ After safety and balance checks pass:
 
 After the user signs and broadcasts the transaction:
 
-- Call `submit_tx_hash` with the transaction hash so vaults.fyi can track it.
+- Call `submit_tx_hash` with `sessionId` and `stepId` (from the `build_vault_tx` response) and the broadcast `txHash`.
 - Call `get_transaction_status` to confirm the deposit landed.
 - Verify the new position with Zerion:
 

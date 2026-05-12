@@ -33,7 +33,7 @@ license: MIT
 ## Requirements
 - Zerion CLI: `npm install -g zerion-cli`
 - Zerion API key: `export ZERION_API_KEY="zk_..."`
-- vaults.fyi MCP server connected
+- [vaults.fyi hosted MCP v2](https://mcp.vaults.fyi/mcp) connected
 - An existing vault position to exit
 
 ## Workflow
@@ -93,11 +93,11 @@ Require explicit user approval before proceeding.
 
 ### 5. Execute the withdrawal
 
-Call `build_vault_tx` with the withdrawal action for the source vault. Present the unsigned transaction to the user for signing.
+Call `build_vault_tx` with `action: "redeem"` (or `"request-redeem"` for complex flows), `userAddress`, `network`, and `vaultId` for the source vault. Present the unsigned transaction to the user for signing.
 
 After signing and broadcasting:
 
-- Call `submit_tx_hash` to track the withdrawal.
+- Call `submit_tx_hash` with `sessionId`, `stepId` (from the `build_vault_tx` response), and the broadcast `txHash` to track the withdrawal.
 - Call `get_transaction_status` to confirm the withdrawal settled.
 - Verify the assets arrived in the wallet:
 
@@ -127,11 +127,11 @@ For cross-chain + different asset, bridge first, then swap on the destination ch
 
 Call `transaction_context` for the destination vault to confirm the deposit asset, decimals, and wallet balance.
 
-Call `build_vault_tx` with the deposit action, using `humanAmount` and `decimals` from `transaction_context` (the tool converts to base units automatically). Present the unsigned transaction for signing.
+Call `build_vault_tx` with `action: "deposit"`, `userAddress`, `network`, `vaultId`, and preferably `humanAmount` + `decimals` from `transaction_context` (the tool converts to base units automatically). Present the unsigned transaction for signing.
 
 After signing and broadcasting:
 
-- Call `submit_tx_hash` to track the deposit.
+- Call `submit_tx_hash` with `sessionId`, `stepId`, and `txHash` to track the deposit.
 - Call `get_transaction_status` to confirm the deposit settled.
 
 ### 8. Verify the rebalance

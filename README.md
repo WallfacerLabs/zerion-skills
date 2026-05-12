@@ -13,20 +13,20 @@ Each skill follows the [Zerion partner skill format](https://github.com/zerionte
 | [market-intel](skills/zerion-vaultsfyi-market-intel/) | Benchmark rate environments, side-by-side vault comparison, curator profiles |
 | [rebalance](skills/zerion-vaultsfyi-rebalance/) | Full exit-to-enter vault rotation with cross-chain bridging via Zerion |
 | [watchlist](skills/zerion-vaultsfyi-watchlist/) | Multi-wallet yield monitoring using Zerion's watchlist |
-| [strategist](skills/zerion-vaultsfyi-strategist/) | Backtesting, allocation breakdowns, rate environment analysis, curator track records |
+| [strategist](skills/zerion-vaultsfyi-strategist/) | Backtesting, rate environment analysis, curator track records |
 | [risk-monitor](skills/zerion-vaultsfyi-risk-monitor/) | Flag and incident tracking, score degradation, capital flight detection, withdrawal readiness |
 
 ## How the tools work together
 
 - **Zerion CLI** handles wallet analysis (`zerion analyze`, `zerion positions`), execution (`zerion swap`, `zerion bridge`), and wallet management (`zerion watch`).
-- **vaults.fyi MCP** provides yield intelligence: vault search and ranking, risk scores, curator data, benchmark rates, historical APY/TVL, allocation breakdowns, and transaction construction.
+- **vaults.fyi MCP** provides yield intelligence: vault search and ranking, risk scores, curator data, benchmark rates, historical APY/TVL, and transaction construction.
 
 Zerion answers "what do I have?" vaults.fyi answers "how is it performing and what should I do about it?"
 
 ## Requirements
 
 - [Zerion CLI](https://github.com/zeriontech/zerion-ai) installed with API key
-- [vaults.fyi MCP server](https://www.npmjs.com/package/@anthropic/vaultsfyi-mcp) connected
+- [vaults.fyi hosted MCP v2](https://mcp.vaults.fyi/mcp) connected
 
 ## Status
 
