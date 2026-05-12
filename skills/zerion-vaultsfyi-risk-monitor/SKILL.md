@@ -26,7 +26,6 @@ license: MIT
 - vaults.fyi MCP: `vault_details` — deep inspection of flagged or concerning vaults
 - vaults.fyi MCP: `vault_apy_history` — detect APY collapse or volatility
 - vaults.fyi MCP: `vault_tvl_history` — detect capital flight from a vault
-- vaults.fyi MCP: `vault_allocation` — inspect what a vault is actually holding (Morpho/Euler)
 - vaults.fyi MCP: `benchmark_apy` — compare position yield against market baseline
 - vaults.fyi MCP: `vaults_search` — find safer alternatives for positions that need to be exited
 - vaults.fyi MCP: `transaction_context` — check withdrawal availability and constraints
@@ -73,7 +72,7 @@ For each position, compare current performance against benchmarks:
 
 - Call `benchmark_apy` for the position's network and asset type (USD or ETH).
 - Flag positions where 30d APY is more than 2 percentage points below the benchmark.
-- Call `vault_apy_history` for 30 days to detect APY decay (declining trend over the last 7-14 days).
+- Call `vault_apy_history` with `fromTimestamp` set to 30 days ago (current unix timestamp minus 2592000) to detect APY decay (declining trend over the last 7-14 days).
 
 Classify:
 
@@ -86,29 +85,20 @@ Classify:
 
 For positions above $10,000 in value:
 
-- Call `vault_tvl_history` for 30 days.
+- Call `vault_tvl_history` with `fromTimestamp` set to 30 days ago.
 - Flag vaults where TVL dropped more than 20% in the last 14 days — capital flight often precedes or accompanies problems.
 - Flag vaults where TVL spiked more than 50% — sudden inflows can dilute yield or signal mercenary capital chasing temporary incentives.
 
-### 5. Allocation risk (Morpho/Euler vaults)
+### 5. Withdrawal readiness
 
-For positions in curator-managed vaults:
-
-- Call `vault_allocation` to inspect the underlying markets.
-- Flag concentrated allocations (>50% in a single market).
-- Flag high-utilization markets (>90%) — these may create withdrawal friction.
-- Flag markets with volatile collateral assets.
-
-### 6. Withdrawal readiness
-
-For any position flagged in steps 2-5:
+For any position flagged in steps 2-4:
 
 - Call `transaction_context` to check whether withdrawal is currently available.
 - Check `transactionalProperties.redeemStepsType`: if `"complex"`, the exit requires multiple transactions with potential delays. The `vaultSpecificData` field may contain cooldown durations, queue positions, or settlement window dates.
 - Identify cooldown requirements, withdrawal queues, request-then-claim patterns, or timelock constraints.
 - If immediate exit isn't possible, surface the earliest available exit path and timeline. For vaults with complex redeem flows, note whether the user needs to initiate a cooldown/request action now to start the clock.
 
-### 7. Concentration risk
+### 6. Concentration risk
 
 Across the full portfolio, flag:
 
@@ -117,7 +107,7 @@ Across the full portfolio, flag:
 - **Single protocol:** >50% of deployed capital in one protocol
 - **Single network:** >70% of deployed capital on one network
 
-### 8. Compile the risk report
+### 7. Compile the risk report
 
 Present in priority order:
 
@@ -137,16 +127,13 @@ Present in priority order:
 **4. Capital flow signals**
 - Vaults with significant TVL changes and what that might indicate
 
-**5. Allocation concerns** (if applicable)
-- Concentrated or high-risk market allocations
-
-**6. Concentration risk**
+**5. Concentration risk**
 - Portfolio-level concentration flags
 
-**7. Portfolio status**
+**6. Portfolio status**
 - Total deployed value, number of positions, overall risk posture (clean / caution / action needed)
 
-### 9. Suggest actions
+### 8. Suggest actions
 
 For each flagged position, recommend a specific next step:
 
@@ -163,7 +150,6 @@ For exit recommendations, confirm alternatives exist:
 ## Common Blockers
 - **No active flags across all positions:** Good news. Report the portfolio as clean with current scores and benchmark comparisons. A clean report is still valuable.
 - **Flag data is point-in-time:** Flags reflect current state, not history. A vault may have had a critical flag last week that's since been resolved. Note that flag monitoring is most useful when run regularly.
-- **Allocation data limited to certain vault types:** `vault_allocation` works best for Morpho and Euler curator-managed vaults. Other vault types may not decompose.
 - **Withdrawal not available due to cooldown:** Some exit paths require initiating a cooldown first. Surface the timeline so the user can plan.
 - **False positives on TVL changes:** TVL can drop because a single large depositor withdrew (whale exit), not because of a vault problem. Note this possibility when flagging TVL declines.
 

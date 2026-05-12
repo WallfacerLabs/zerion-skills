@@ -127,7 +127,7 @@ For cross-chain + different asset, bridge first, then swap on the destination ch
 
 Call `transaction_context` for the destination vault to confirm the deposit asset, decimals, and wallet balance.
 
-Call `build_vault_tx` with the deposit action. Present the unsigned transaction for signing.
+Call `build_vault_tx` with the deposit action, using `humanAmount` and `decimals` from `transaction_context` (the tool converts to base units automatically). Present the unsigned transaction for signing.
 
 After signing and broadcasting:
 

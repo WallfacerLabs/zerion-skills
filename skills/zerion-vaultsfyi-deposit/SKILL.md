@@ -62,8 +62,8 @@ If the user provided an address, call `vault_details` directly with the address 
 Gather the full risk and performance picture:
 
 - Call `vault_details` for score, flags, fees, curator, protocol, capacity, and underlying asset.
-- Call `vault_apy_history` for 30-day APY trend.
-- Call `vault_tvl_history` for 30-day TVL trend.
+- Call `vault_apy_history` for 30-day APY trend. Set `fromTimestamp` to 30 days ago (current unix timestamp minus 2592000) to get recent data.
+- Call `vault_tvl_history` for 30-day TVL trend. Set `fromTimestamp` the same way.
 - Call `benchmark_apy` with the matching benchmark (`usd` for stablecoins, `eth` for ETH-denominated vaults) on the vault's network.
 
 Use `apyComposite.totalApy` when present instead of top-level APY.
@@ -119,8 +119,7 @@ Inspect `transactionalProperties.depositStepsType` from `vault_details` or `tran
 
 After safety and balance checks pass:
 
-- Convert the human-readable amount to base units using decimals from `transaction_context`.
-- Call `build_vault_tx` with the wallet address, vault ID, network, and amount.
+- Call `build_vault_tx` with the wallet address, vault ID, network, `humanAmount` (e.g. "10"), and `decimals` from `transaction_context` (e.g. 6 for USDC, 18 for WETH). The tool converts to base units automatically.
 - For complex deposit flows, `build_vault_tx` returns multiple ordered steps. Present all steps with their sequence and any required delays.
 - Present the unsigned transaction steps and decoded calls to the user.
 - Do not sign or broadcast. The user must explicitly approve.

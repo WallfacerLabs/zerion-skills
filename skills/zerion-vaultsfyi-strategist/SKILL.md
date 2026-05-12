@@ -1,7 +1,7 @@
 ---
 name: zerion-vaultsfyi-strategist
 description: >
-  Institutional-grade yield strategy analysis using vaults.fyi historical data, allocation breakdowns, benchmark rate environments, share price trends, and curator track records, paired with Zerion wallet context.
+  Institutional-grade yield strategy analysis using vaults.fyi historical data, benchmark rate environments, share price trends, and curator track records, paired with Zerion wallet context.
 license: MIT
 ---
 
@@ -11,13 +11,12 @@ license: MIT
 
 ## When to use
 - "If I'd been in vault A instead of vault B, how much more would I have earned?"
-- "What's actually inside this Morpho vault?"
 - "Are rates high right now or should I wait?"
 - "Which curator has the best track record?"
 - "Compare Gauntlet vs Steakhouse vs RE7 over the last 30 days"
 - "Why is this vault's APY so high?"
 - "Break down where this vault's yield is coming from"
-- Any request for backtesting, allocation analysis, rate environment assessment, or curator evaluation
+- Any request for backtesting, rate environment assessment, or curator evaluation
 
 ## Key Commands
 - `zerion portfolio <address>` — current portfolio for context
@@ -28,7 +27,6 @@ license: MIT
 - vaults.fyi MCP: `vault_tvl_history` — historical TVL trends
 - vaults.fyi MCP: `vault_history` — share price history for precise return calculation
 - vaults.fyi MCP: `vault_returns` — realized returns for a specific wallet
-- vaults.fyi MCP: `vault_allocation` — market-level breakdown of what a vault holds (Morpho, Euler)
 - vaults.fyi MCP: `benchmark_apy` — current network benchmark rate
 - vaults.fyi MCP: `benchmark_apy_history` — historical benchmark for rate environment analysis
 - vaults.fyi MCP: `curators` — list and normalize curator names
@@ -49,9 +47,9 @@ Compare historical performance of two or more vaults to quantify the difference 
 
 For each vault being compared:
 
-- Call `vault_apy_history` for the comparison window (30, 60, or 90 days).
-- Call `vault_history` for share price data over the same period.
-- Call `vault_tvl_history` to understand capital flow context.
+- Call `vault_apy_history` for the comparison window (30, 60, or 90 days). Set `fromTimestamp` to the start of the window (e.g. current unix timestamp minus 2592000 for 30 days) — without it, the API returns data from vault creation.
+- Call `vault_history` for share price data over the same period. Use the same `fromTimestamp`.
+- Call `vault_tvl_history` to understand capital flow context. Use the same `fromTimestamp`.
 - Call `vault_details` for current score, fees, and flags.
 
 ### 2. Calculate comparative returns
@@ -87,41 +85,6 @@ Call vaults.fyi `vault_returns` with the wallet address and vault to get realize
 | Fees | | |
 
 State the dollar difference clearly: "Over the last 30 days, vault B would have earned $X more on a $10,000 position."
-
----
-
-### Allocation Breakdown: "What's actually inside this vault?"
-
-Decompose a vault's underlying holdings at the market level. This is unique to vaults.fyi — competitors treat vaults as black boxes.
-
-### 1. Pull the allocation
-
-Call `vault_allocation` with the vault ID and network. This returns the market-level breakdown showing where capital is actually deployed.
-
-For Morpho vaults, this shows:
-- Which lending markets the curator has allocated to
-- What percentage of the vault's capital sits in each market
-- The borrower-side assets and collateral types in each market
-- Utilization rates per market
-
-For Euler vaults, similar decomposition into sub-vaults and markets.
-
-### 2. Assess allocation quality
-
-- **Concentration:** Is >50% of the vault in a single market? Flag it.
-- **Collateral quality:** What are borrowers posting as collateral? Volatile assets = higher risk.
-- **Utilization:** High utilization means higher yield but also higher withdrawal risk.
-- **Diversification:** How many markets is the curator using? More markets = more resilience.
-
-### 3. Compare to wallet context
-
-If the user holds this vault, pull their position from Zerion:
-
-```bash
-zerion positions <address>
-```
-
-Show the user that their "$X in vault Y" is actually distributed across specific markets with specific risk profiles. Make the invisible visible.
 
 ---
 
@@ -198,16 +161,7 @@ For each curator, aggregate:
 | Assets managed | | | |
 | APY consistency (range over 30d) | | | |
 
-### 3. Allocation quality (for Morpho/Euler curators)
-
-For curators managing allocation-based vaults, call `vault_allocation` on their top vaults to assess:
-
-- Market diversification
-- Collateral quality choices
-- Utilization management
-- Whether they concentrate in safe markets or reach for yield in riskier ones
-
-### 4. Verdict
+### 3. Verdict
 
 Rank curators on:
 1. **Risk management:** incident frequency, score consistency, flag history
@@ -223,7 +177,6 @@ zerion positions <address>
 
 ## Common Blockers
 - **Limited historical data for new vaults:** Vaults launched recently won't have 90-day history. Note the available data window and compare only within it.
-- **Allocation data not available for all vault types:** `vault_allocation` is richest for Morpho and Euler vaults with curator-managed allocations. Simpler vault types (single-strategy, ERC-4626 wrappers) may not decompose further.
 - **Benchmark not available for all networks:** Smaller or newer networks may lack benchmark history. Note the gap.
 - **Curator comparison across different assets:** Comparing a stablecoin curator to an ETH curator on raw APY is misleading. Group by asset class and compare within groups.
 - **Complex deposit/redeem flows affect strategy viability:** When recommending vaults or curators, factor in `transactionalProperties`. A vault with `redeemStepsType: "complex"` (e.g., quarterly settlement, multi-day cooldowns) is less suitable for active rebalancing strategies. A vault with `depositStepsType: "complex"` has higher operational cost to enter. Include flow type in curator and vault assessments.
